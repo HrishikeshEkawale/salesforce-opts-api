@@ -33,5 +33,13 @@ traits:
           application/json:
             example: !include /library/example/response/post-response.json  
 
-
+/deals:
+  get:
+    is: [errorTraits]
+    headers:
+      user-name: string
+    responses:
+          200:
+                body:
+                      application/json:  
  
