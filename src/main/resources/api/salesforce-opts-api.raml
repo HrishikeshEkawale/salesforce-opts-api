@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: salesforce-opts-api
-baseUri: https://salesforce-opt-api.us-e2.cloudhub.io/api
+baseUri: https://salesforce-opts-api.us-e2.cloudhub.io/api
 traits:
   errorTraits: !include /library/trait.raml
 
@@ -33,13 +33,5 @@ traits:
           application/json:
             example: !include /library/example/response/post-response.json  
 
-/deals:
-  get:
-    is: [errorTraits]
-    headers:
-      user-name: string
-    responses:
-          200:
-                body:
-                      application/json:  
+
  
