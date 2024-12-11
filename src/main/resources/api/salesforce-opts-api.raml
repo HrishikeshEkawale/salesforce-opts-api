@@ -1,0 +1,35 @@
+#%RAML 1.0
+title: salesforce-opts-api
+baseUri: https://salesforce-opt-api.us-e2.cloudhub.io/api
+traits:
+  errorTraits: !include /library/trait.raml
+
+  trait:
+    is:
+      - errorTraits
+    responses:
+      "200":
+        body:
+          application/json:
+            type: any
+/opportunities:
+  /{id}:
+    get:
+      description: "send Id in query parameter to get type and name"
+      is: [errorTraits]
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include /library/example/response/example.json    
+  post:
+    body:
+      application/json:
+        example: !include /library/example/request/post-body.json
+    is: [errorTraits]
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include /library/example/response/post-response.json  
+ 

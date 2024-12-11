@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="687783f3-cade-46c3-93b1-c39e9c3e7f77" >
+		<salesforce:basic-connection username="firstpoc@relanto.sfsandbox" password="mulepoc2025" securityToken="32RCLlRLJn3csW7NH8yAQgR4M" url="https://login.salesforce.com/services/Soap/u/60" />
+	</salesforce:sfdc-config>
+	<flow name="sfdc-call-get-info" doc:id="b0a142c1-d92c-4730-bfd2-efedc94b7591" >
+		<!-- [STUDIO:"Get user info"]<salesforce:get-user-info doc:name="Get user info" doc:id="17ddc557-96c8-4f18-b2ff-2b1f3807ccf3" config-ref="Salesforce_Config"/> [STUDIO] -->
+		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message" doc:id="ba701f72-4245-4d94-897d-37b66a6b8d7d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+payload&#93;&#93;></ee:set-payload>
+			</ee:message>
+		</ee:transform> [STUDIO] -->
+		<!-- [STUDIO:"Logger"]<logger level="INFO" doc:name="Logger" doc:id="c8f31330-8151-4ad4-8fb7-34102ae2ce98" message="#[payload&#93;"/> [STUDIO] -->
+		<salesforce:query doc:name="Query" doc:id="c9af5010-5dc2-4b75-988e-c0463182c640" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[select Id,Name from opportunities__c where id__c = :id]]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	id : vars.id
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="78f88c16-89d9-4afa-8aca-4e813c6f766f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="b41284cb-4fa7-410a-8386-3027381d4808" message="#[payload]"/>
+	</flow>
+	<flow name="sfdc-call-create" doc:id="090d1294-2b6c-4d9e-b768-b4b963d74ceb" >
+		<ee:transform doc:name="Transform Message" doc:id="4a6e660a-3ffb-418a-a280-2f640075426b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	Id__c: payload01.Id,
+	opportunity_id__c: payload01.opportunity_id,
+	opportunity_name__c: payload01.opportunity_name,
+	account_id__c: payload01.account_id,
+	account_name__c: payload01.account_name,
+	global_account__c: payload01.global_account,
+	business_type__c: payload01.business_type,
+	opportunity_owner__c: payload01.opportunity_owner,
+	sales_region__c: payload01.sales_region,
+	deal_id__c: payload01.deal_id,
+	close_date__c: payload01.close_date as DateTime,
+	last_modified_date__c: payload01.last_modified_date as DateTime
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:upsert doc:name="Upsert" doc:id="fcd7e3a3-8c2f-4600-99fc-3410ab48fb1a" config-ref="Salesforce_Config" objectType="opportunities__c" externalIdFieldName="Id__c"/>
+		<ee:transform doc:name="Transform Message" doc:id="8797f808-1838-48fe-bc14-b0f50ee16e88" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="e347600d-9a1c-4d89-b142-fd6a00be705d" message="#[payload]"/>
+	</flow>
+	<flow name="sfdc-call-get-deals" doc:id="c1bae102-b66a-464f-8ff6-7b9d72108eb2" >
+		<salesforce:query doc:name="Query" doc:id="a540e958-bc43-4ac7-80b3-aec51e4fb96b" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[select name, AccountNumber ,Active__c ,BillingAddress from account where name = :name]]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[output application/java
+---
+{
+	name : attributes.headers.'user-name'
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="fcc54c4c-4828-4a73-829f-b46dae8781c7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="998bdc9e-9a84-484f-b5b8-182f693c1eff" message="#[payload]"/>
+	</flow>
+</mule>
