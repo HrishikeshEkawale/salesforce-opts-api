@@ -27,7 +27,7 @@ This MuleSoft application serves as a powerful tool for organizations looking to
 
 Show Type and Name of the given Id
 
-**URL** : 'http://salesforce-opt-api.us-e2.cloudhub.io/api'
+**URL** : 'http://salesforce-opts-api.us-e2.cloudhub.io/api/'
 
 **Query Parameters** : NO
 
