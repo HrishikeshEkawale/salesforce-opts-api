@@ -33,13 +33,5 @@ traits:
           application/json:
             example: !include /library/example/response/post-response.json  
 
-/case-deatils:
-    get:
-      description: "send Case Id in query parameter to get case details"
-      is: [errorTraits]
-      responses:
-        200:
-          body:
-            application/json:
-              example: !include /library/example/response/example.json   
+
  
